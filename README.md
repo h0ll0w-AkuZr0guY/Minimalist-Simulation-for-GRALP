@@ -1,15 +1,15 @@
 ﻿# Minimalist Simulation for GRALP
 
-这是一个为 github.com/hnsqdtt/GRALP 准备的极简 PyBullet 仿真环境，用来自带的 PPO 导航策略（ppo_api/latest.pt）做快速验证与可视化。
+这是一个为 github.com/hnsqdtt/GRALP 准备的极简 PyBullet 仿真环境，用 ONNXRuntime 版 PPO 导航策略（ppo_api/policy.onnx，经 `ppo_api.inference.PPOInference` 调用）做快速验证与可视化。
 
 ## 依赖
 - Python 3.8+
-- pip 包：pybullet、numpy、torch（按 CPU/CUDA 版本安装，见 ppo_api/README.md 提示）
+- pip 包：pybullet、numpy、onnxruntime（CPU）；如需 GPU/TensorRT 请安装 onnxruntime-gpu，对应执行后端在 ppo_api/config.json 的 `execution_provider` 配置
 - Windows 用户可直接运行 start.bat；其他平台运行 python task.py 即可
 
 ## 快速开始
 1) 建议在仓库根目录创建虚拟环境：`python -m venv .venv && .\.venv\Scripts\activate`
-2) 安装依赖：`pip install pybullet numpy torch --index-url https://download.pytorch.org/whl/cpu`（如需 CUDA，请换成对应的官方 index-url）
+2) 安装依赖：`pip install pybullet numpy onnxruntime`（有 CUDA/TensorRT 的机器可改用 `pip install onnxruntime-gpu`）
 3) 运行模拟：`python task.py`（或双击 start.bat）
 4) 相机操作：右键旋转视角，左键拖拽平移，滚轮缩放；`Ctrl+C` 退出
 
@@ -17,10 +17,10 @@
 - simulation_config.json：物理与场景参数。常用项：
   - TIMESTEP/GRAVITY；MAP_SIZE、WALL_HEIGHT/THICKNESS；STATIC_OBSTACLE_COUNT、DYNAMIC_OBSTACLE_COUNT、DYNAMIC_OBSTACLE_SPEED_RANGE
   - ROBOT_START_POS、ROBOT_RADIUS/HEIGHT/COLOR、OBSTACLE_INFLATION_EXTRA；相机 CAM_* 与鼠标灵敏度；DEBUG_MODE（true 时显示雷达射线）
-- ppo_api/config.json：策略相关。
+- ppo_api/config.json：策略相关（供 ONNXRuntime 推理使用）。
   - vx_max/omega_max 与 dt 用于动作限幅及控制周期；
   - patch_meters 作为雷达量程，ray_max_gap 决定射线数：LIDAR_NUM_RAYS = ceil((2π·patch_meters)/ray_max_gap)
-  - ckpt_filename 默认 latest.pt，可改为自定义权重
+  - ckpt_filename 默认 policy.onnx，可改为自定义 ONNX 权重；execution_provider 控制 cpu/cuda/tensorrt 后端
 - config_loader.py 会合并两份配置到 Config；LIDAR_RANGE/LIDAR_FOV/LIDAR_NUM_RAYS、CTRL_VX_MAX/CTRL_OMEGA_MAX 等在运行时由此派生，无需手改代码。
 
 ## 局部任务点选择机制
