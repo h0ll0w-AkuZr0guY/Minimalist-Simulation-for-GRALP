@@ -1,11 +1,12 @@
+# -*- coding: utf-8 -*-
 from __future__ import annotations
 
 """
-Lightweight PPO inference (strict input validation).
-- Loads limits/model config from `config.json`; default weight resolution: policy.onnx -> latest.onnx -> final.onnx.
-- `execution_provider` controls ONNX Runtime EP (cpu/cuda/tensorrt), default cpu.
-- Observations: rays in meters normalized to [0,1]; pose tail 7 dims [sin_ref, cos_ref, prev_vx/vx_max, prev_omega/omega_max, dvx/(2*vx_max), domega/(2*omega_max), task_dist/patch_meters].
-- Actions: 2-D [vx, omega] in SI units.
+轻量级PPO推理模块（严格的输入验证）
+- 从`config.json`加载限制/模型配置；默认权重分辨率：policy.onnx -> latest.onnx -> final.onnx。
+- `execution_provider`控制ONNX Runtime执行提供程序(cpu/cuda/tensorrt)，默认cpu。
+- 观测数据：归一化到[0,1]的米制距离射线数据；7维姿态信息[sin_ref, cos_ref, prev_vx/vx_max, prev_omega/omega_max, dvx/(2*vx_max), domega/(2*omega_max), task_dist/patch_meters]。
+- 动作：2D数组[vx, omega]，单位为国际标准单位。
 """
 
 import json
